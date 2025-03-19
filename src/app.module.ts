@@ -32,7 +32,7 @@ import elasticsearchConfig from './config/elasticsearch.config';
       autoLoadEntities: true,
       synchronize: true,
       entities: [User],
-      logging: true,
+      // logging: true,
       retryAttempts: 3,
       retryDelay: 3000,
       ssl: false,
