@@ -11,6 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = app.get(CustomLogger);
   
+  app.setGlobalPrefix('api/v1/');
   app.enableCors();
   app.useGlobalInterceptors(new LoggingInterceptor(logger));
   app.useGlobalPipes(
