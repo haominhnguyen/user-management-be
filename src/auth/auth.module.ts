@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomLogger } from '../services/logger.service';
+import { integer } from '@elastic/elasticsearch/lib/api/types';
+import { env } from 'process';
 
 @Module({
   imports: [
@@ -15,8 +17,8 @@ import { CustomLogger } from '../services/logger.service';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'), // Ensure this is set in your .env file
-        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRATION') },
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') ?? '1h' },
       }),
       inject: [ConfigService],
     }),
@@ -25,6 +27,7 @@ import { CustomLogger } from '../services/logger.service';
   providers: [
     AuthService, 
     JwtStrategy,
+    User,
     {
       provide: CustomLogger,
       useValue: new CustomLogger('AuthService'),

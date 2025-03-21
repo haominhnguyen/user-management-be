@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,11 +12,12 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
+    private readonly usr: User,
     private readonly logger: CustomLogger,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    this.logger.debug({
+    this.logger.log({
       message: 'Validating user credentials',
       email,
     });
@@ -27,10 +28,11 @@ export class AuthService {
         message: 'User not found during validation',
         email,
       });
-      throw new UnauthorizedException('Invalid email or password');
+      
+      throw new BadRequestException('Not found user!!!');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await this.usr.validatePassword(password, user.password);
     if (!isPasswordValid) {
       this.logger.warn({
         message: 'Invalid password during validation',
